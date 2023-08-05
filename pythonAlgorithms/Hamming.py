@@ -1,94 +1,81 @@
 
-import math
+class Hamming:
+    def __init__(self, n: int, m: int, code: str):
+        r = n - m
 
-def decompose_into_powers_of_2(n):
-    powers = []
-    power_of_2 = 1
+        if not ((m + r + 1) <= 2**r):
+            raise Exception("\n\nla secuencia no cumple: (m + r + 1) <= 2 ** r\n\n")
+        else:
+            self.code = code
+
+
+
+    def get_parity(self, index: int, lcode: list[str]):
+        val = 0
+
+        for i in range(1, self.final_bits + 1):
+            if i & index != 0:
+                if lcode[i].startswith("P"):
+                    continue
+
+                bit = int(lcode[i])
+                val ^= bit
+
+        return val
     
-    while n > 0:
-        if n % 2 == 1:
-            powers.append(power_of_2)
-        n //= 2
-        power_of_2 *= 2
-    
-    return powers
 
 
-def hamming(code: str, n: int, m: int) -> str:
-    """
-    data bits: 
-    parity bits:
-
-    colocar 2**r paridades
-
-    code: la secuencia
-    m: longitud inicial
-    n: longitud final
-
-    r es un exponente que cumple 2**r >= m + r + 1
-    """
-
-    # variables
-    parities = {}
-    data = {}
-    count = 1
-    r = n - m
-
-    # ver bits de paridades
-    for i in range(0, r):
-        parities[f"p{count}"] = 2**i
-        i += 1
-        count += 1
-    
-    
-    # revisar si se cumple la condicion
-    if not (m + r + 1 <= math.pow(2,r)):
-        print(r)
-        return None
+    def parities_rel_bits(self):
+        r = 0
+        m = len(self.code)
         
+        while 2**r < m + r + 1:
+            r += 1
+        
+        self.final_bits = m + r
+        self.parityBitCount = r
+
+        return r
+
+
+
+    def set_parity_pos(self):
+        j = 0
+        code_arr = [None] * (self.final_bits + 1)
+        
+        for i in range(1, self.final_bits + 1):
+            if i == 2**j:
+                code_arr[i] = "P" + str(j + 1)
+                j += 1
+            else:
+                code_arr[i] = self.code[i - j - 1]
+
+        for j in range(self.parityBitCount):
+            index = 2**j
+            code_arr[index] = "(" + str(self.get_parity(index, code_arr)) + ")"
+
+        return code_arr
+
+
+
+    def bits_to_code(self, code_arr_l: list):
+        code = ""
+        bitsInsideParentheses = ""
+
+        for i in range(1, len(code_arr_l)):
+            if code_arr_l[i] is not None:
+                code += code_arr_l[i]
+                if code_arr_l[i].startswith("(") and code_arr_l[i].endswith(")"):
+                    bitsInsideParentheses += code_arr_l[i][1:-1]
+
+        return (code.replace(")", "").replace("(", ""), bitsInsideParentheses)
     
-    # obtener bits de datos
-    count = 1
-    for i in range(1, n+1):
-        data[f"d{count}"] = i
-        count += 1
-
-    # Create a set of unique values from dict1
-    parities_pos_arr = set(parities.values())
-
-    # posiciones del output
-    data = {key: value for key, value in data.items() if value not in parities_pos_arr}
-
-    # fully merged
-    positions = data | parities
-
-    # ver las posiciones de los bits de datos
-    data_values = list(data.values())
-
-    # calcular sus ecuas
-    ecuas = {}
-    for i in data_values:
-        ecuas[i] = decompose_into_powers_of_2(i)
-    
-    p_parity_pos = {}
-    for i in parities_pos_arr:
-        p_parity_pos[i] = []
-    
-    # ahora ver la paridad de cada p'i
-    for bit in parities_pos_arr:
-        for val, sumandos in ecuas.items():
-            if bit in sumandos:
-                p_parity_pos[bit].append(val)
 
 
-    # ahora relacionar las posiciones de data con los bits
-    bit_data_pos = {}
-    for i in data_values:
-        bit_data_pos[i] = None
-
-
-    return data
-
-
-
-print(hamming(code="011101", n=11, m=7))
+    def encode_sec(self):
+        print("Secuencia ingresada: ", self.code)
+        print("Bits de paridad: ", self.parities_rel_bits())
+        hammingCodeArray = self.set_parity_pos()
+        self.encoded_code, self.parityBits = self.bits_to_code(hammingCodeArray)
+        print("Codigo: ", self.encoded_code)
+        print("Bits de paridad: ", self.parityBits)
