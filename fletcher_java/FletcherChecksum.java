@@ -1,4 +1,4 @@
-package java_algorithms;
+package fletcher_java;
 
 import java.util.ArrayList;
 
