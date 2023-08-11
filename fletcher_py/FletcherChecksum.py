@@ -78,6 +78,15 @@ class FletcherChecksum(object):
         :param message: Mensaje que consta de una cadena de dígitos binarios y un checksum.
         :return: Cadena original si no se detectan errores, o ubicación del error si se detectan errores.
         """
+        # Verificar la longitud del mensaje
+        if len(message) < 16:
+            return {
+                'trama': '',
+                'tamaño_trama': 0,
+                'tamaño_bloque': self.block_size,
+                'error': 1
+            }
+        
         data = message[:-16]
         received_checksum = int(message[-16:], 2)
 
@@ -102,7 +111,10 @@ class FletcherChecksum(object):
 
         calculated_checksum = (S2 << 8) | S1
 
-        if calculated_checksum == received_checksum:
-            return "No se detectaron errores: " + data
-        else:
-            return f"Se detectaron errores en las posiciones {error_location}: la trama se descarta"
+        # Devolver un diccionario con la información requerida
+        return {
+            'trama': data,
+            'tamaño_trama': len(data),
+            'tamaño_bloque': self.block_size,
+            'error': 1 if error_location else 0
+        }
