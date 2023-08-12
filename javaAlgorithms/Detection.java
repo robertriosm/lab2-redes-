@@ -1,10 +1,14 @@
+import static java.lang.Math.floor;
+import static java.lang.Math.log;
+import static java.lang.Math.pow;
+
 public class Detection {
     private String code;
     private String codeWithErrors;
     private String cleanedData;
-    private String errors;
     private String parities;
-    private String corrected;
+    private String errors;
+    public String corrected;
 
     public Detection(String code, String errors) {
         this.code = code;
@@ -12,11 +16,11 @@ public class Detection {
     }
 
     public void decode(Hamming hamming) {
-        this.cleanedData = this.cleanBits();
+        this.cleanedData = cleanBits();
         Hamming h = new Hamming(11, 7, this.cleanedData);
         h.hamming();
-        this.errors = this.comparison(hamming.parities, h.parities);
-        this.corrected = this.fixErrors(hamming.parities);
+        this.errors = comparison(hamming.parities, h.parities);
+        this.corrected = fixErrors(hamming.parities);
     }
 
     public String cleanBits() {
@@ -24,7 +28,7 @@ public class Detection {
         this.parities = "";
 
         for (int i = 0; i < this.codeWithErrors.length(); i++) {
-            if ((i + 1) != Math.pow(2, (int) Math.floor(Math.log(i + 1) / Math.log(2)))){
+            if ((i + 1) != pow(2, (int) floor(log(i + 1) / log(2)) )) {
                 cleaned += this.codeWithErrors.charAt(i);
             } else {
                 this.parities += this.codeWithErrors.charAt(i);
@@ -35,17 +39,17 @@ public class Detection {
     }
 
     public String comparison(String lastOne, String withErrors) {
-        String errors = "";
+        StringBuilder errors = new StringBuilder();
 
         for (int i = 0; i < lastOne.length(); i++) {
             if (lastOne.charAt(i) == withErrors.charAt(i)) {
-                errors += "0";
+                errors.append("0");
             } else {
-                errors += "1";
+                errors.append("1");
             }
         }
 
-        return new StringBuilder(errors).reverse().toString();
+        return errors.reverse().toString();
     }
 
     public int toDecimal() {
@@ -54,7 +58,7 @@ public class Detection {
 
         for (int i = 0; i < rev.length(); i++) {
             if (rev.charAt(i) == '1') {
-                d += (int) Math.pow(2, i);
+                d += Math.pow(2, i);
             }
         }
 
@@ -63,19 +67,13 @@ public class Detection {
 
     public String fixErrors(String parities) {
         int count = 0;
-        String compared = this.comparison(parities, this.parities);
+        String compared = comparison(parities, this.parities);
         StringBuilder result = new StringBuilder();
         int index = -1;
 
         for (int i = 0; i < this.errors.length(); i++) {
             if (this.errors.charAt(i) == '1') {
-                count++;
-            }
-        }
-
-        for (int i = 0; i < compared.length(); i++) {
-            if (this.errors.charAt(i) == '1') {
-                count++;
+                count += 1;
                 index = i;
             }
         }
@@ -88,7 +86,7 @@ public class Detection {
             char y = val == '0' ? '1' : '0';
             result.append(this.codeWithErrors, 0, errorPos - 1).append(y).append(this.codeWithErrors.substring(errorPos));
         } else {
-            int p = this.toDecimal();
+            int p = toDecimal();
             char val = this.codeWithErrors.charAt(p - 1);
             char y = val == '0' ? '1' : '0';
             result.append(this.codeWithErrors, 0, p - 1).append(y).append(this.codeWithErrors.substring(p));
@@ -99,7 +97,7 @@ public class Detection {
 
     public void printResults() {
         System.out.println("Deteccion:\n" +
-                "Original: " + this.codeWithErrors + "\n" +
-                "Corregida: " + this.corrected + "\n");
+                "    Original: " + this.codeWithErrors + "\n" +
+                "    Corregida: " + this.corrected + "\n");
     }
 }

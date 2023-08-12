@@ -85,6 +85,7 @@ class Detection:
                 y = "0"
             result = self.code_with_errors[:p-1] + y + self.code_with_errors[p:]
         
+        self.count = count
         return result
 
 
@@ -93,4 +94,7 @@ class Detection:
         Original: {self.code_with_errors}
         Corregida: {self.corrected}
         """)
+
+    def receptor(self, size, chunk,):
+        return {"trama": self.corrected, "tamaño_trama": size, "tamaño_bloque": chunk, "error":self.count}
     

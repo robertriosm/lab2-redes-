@@ -3,8 +3,8 @@ public class Hamming {
     private int m;
     private int n;
     private String code;
-    private int finalLen;
-    private String hammingEncoded;
+    private int final_len;
+    public String hammingEncoded;
     public String parities;
 
     public Hamming(int n, int m, String code) {
@@ -12,7 +12,7 @@ public class Hamming {
         this.m = m;
         this.n = n;
 
-        if (!((m + this.r + 1) <= Math.pow(2, this.r))) {
+        if ((m + this.r + 1) > Math.pow(2, this.r)) {
             throw new RuntimeException("\n\nla secuencia no cumple la condicion para ser valida: (m + r + 1) <= 2 ** r\n\n");
         } else {
             this.code = code;
@@ -24,22 +24,22 @@ public class Hamming {
         this.m = this.code.length();
 
         while (Math.pow(2, this.r) < this.m + this.r + 1) {
-            this.r++;
+            this.r += 1;
         }
 
-        this.finalLen = this.m + this.r;
+        this.final_len = this.m + this.r;
         return this.r;
     }
 
-    public int getByIndex(int index, String sequence) {
+    public int getByIndex(int index, String[] sequence) {
         int val = 0;
 
-        for (int i = 1; i <= this.finalLen; i++) {
+        for (int i = 1; i <= this.final_len; i++) {
             if ((i & index) != 0) {
-                if (sequence.charAt(i) == 'p') {
+                if (sequence[i].startsWith("p")) {
                     continue;
                 }
-                val ^= Character.getNumericValue(sequence.charAt(i));
+                val ^= Integer.parseInt(sequence[i]);
             }
         }
 
@@ -47,21 +47,21 @@ public class Hamming {
     }
 
     public String[] setParityPositions() {
-        String[] result = new String[this.finalLen + 1];
+        String[] result = new String[this.final_len + 1];
         int j = 0;
 
-        for (int i = 1; i <= this.finalLen; i++) {
+        for (int i = 1; i <= this.final_len; i++) {
             if (i == Math.pow(2, j)) {
                 result[i] = "p" + (j + 1);
-                j++;
+                j += 1;
             } else {
-                result[i] = String.valueOf(this.code.charAt(i - j - 1));
+                result[i] = Character.toString(this.code.charAt(i - j - 1));
             }
         }
 
         for (int i = 0; i < this.r; i++) {
             int index = (int) Math.pow(2, i);
-            int val = getByIndex(index, String.join("", result));
+            int val = this.getByIndex(index, result);
             result[index] = "(" + val + ")";
         }
 
@@ -71,7 +71,6 @@ public class Hamming {
     public String[] encode(String[] arr) {
         String encoded = "";
         String insides = "";
-
         for (int i = 1; i < arr.length; i++) {
             if (arr[i] != null) {
                 encoded += arr[i];
@@ -81,22 +80,22 @@ public class Hamming {
             }
         }
 
-        return new String[]{encoded.replace("(", "").replace(")", ""), insides};
+        return new String[] { encoded.replace("(", "").replace(")", ""), insides };
     }
 
     public void hamming() {
-        this.getParities();
-        String[] hammingArr = this.setParityPositions();
-        String[] result = this.encode(hammingArr);
-        this.hammingEncoded = result[0];
-        this.parities = result[1];
+        getParities();
+        String[] hammingArr = setParityPositions();
+        String[] encodedResults = encode(hammingArr);
+        this.hammingEncoded = encodedResults[0];
+        this.parities = encodedResults[1];
     }
 
     public void printResults() {
         System.out.println("Hamming:\n" +
-                "Secuencia ingresada: " + this.code + "\n" +
-                "Cantidad de bits de paridad: " + this.getParities() + "\n" +
-                "Codificacion: " + this.hammingEncoded + "\n" +
-                "Bits de paridad: " + this.parities + "\n");
+                "    Secuencia ingresada: " + this.code + "\n" +
+                "    Cantidad de bits de paridad: " + getParities() + "\n" +
+                "    Codificacion: " + this.hammingEncoded + "\n" +
+                "    Bits de paridad: " + this.parities + "\n");
     }
 }
