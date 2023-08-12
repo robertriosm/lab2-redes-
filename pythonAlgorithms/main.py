@@ -1,17 +1,17 @@
-from hamming import *
-from deteccion import *
+from hamming import Hamming
+from detection import Detection
 
 try:
-    print("\n\nPrueba de codificacion:\n\n")
-    hamming = Hamming(11, 7, "110101")
-    hamming.encode_sec()
-except Exception as e:
-    print(f"\n\nSe detecto un error: {e}\n\n")
-    
+    h = Hamming(12, 8, "01100001")
+    h.hamming()
+    h.print_results()
+except ValueError as e:
+    print(e)
+
 try:
-    print("\n\nPrueba de decodificacion:\n\n")
-    hammingDecoding = Deteccion(hamming.encoded_code, "10011110000")
-    hammingDecoding.decode(hamming)
-    
+    detector = Detection(h.code, "111111010011")
+    detector.decode(h)
+    detector.print_results()
 except Exception as e:
-    print(f"\n\n{e}\n\n")
+    print("\nSe ha detectado mas de un error en la trama!")
+    
