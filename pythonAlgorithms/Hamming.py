@@ -1,6 +1,4 @@
-
 class Hamming:
-
     def __init__(self, n: int, m: int, code: str) -> None:
         self.r = n - m
         self.m = m
@@ -11,7 +9,6 @@ class Hamming:
         else:
             self.code = code
 
-    
 
     def get_parities(self):
         self.r = 0
@@ -24,8 +21,7 @@ class Hamming:
         return self.r
 
 
-
-    def get_by_index(self, index, secuence: str):
+    def get_by_index(self, index: int, secuence: str):
         val = 0
 
         for i in range(1, self.final_len + 1):
@@ -35,7 +31,6 @@ class Hamming:
                 val ^= int(secuence[i])
 
         return val   
-
 
 
     def set_parity_positions(self):
@@ -69,13 +64,11 @@ class Hamming:
         return (encoded.replace("(", "").replace(")", ""), insides)
 
 
-
     def hamming(self):
         self.get_parities()
         hamming_arr = self.set_parity_positions()
         self.hamming_encoded, self.parities = self.encode(hamming_arr)
     
-
 
     def print_results(self):
         print(f"""Hamming:
@@ -84,4 +77,3 @@ class Hamming:
             Codificacion: {self.hamming_encoded}
             Bits de paridad: {self.parities}
         """)
-    

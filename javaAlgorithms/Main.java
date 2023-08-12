@@ -1,22 +1,20 @@
-
 public class Main {
     public static void main(String[] args) {
         try {
-            System.out.println("\n\nPrueba de codificacion:\n\n");
-            Hamming hamming = new Hamming(11, 7, "110101");
-            hamming.encode_sec();
-        } catch (Exception e) {
-            System.out.println("\n\nSe detecto un error: " + e + "\n\n");
+            Hamming h = new Hamming(12, 8, "01100001");
+            h.hamming();
+            h.printResults();
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
         }
 
         try {
-            System.out.println("\n\nPrueba de decodificacion:\n\n");
-            Hamming hamming = new Hamming(11, 7, "110101");
-            hamming.encode_sec();
-            Deteccion hammingDecoding = new Deteccion(hamming.encoded_code, "10011110000");
-            hammingDecoding.decode(hamming);
+            Detection detector = new Detection("01100001", "111111010011");
+            detector.decode(new Hamming(12, 8, "01100001")); // Re-creating the Hamming object here; you can also use the previous object if needed
+            detector.printResults();
         } catch (Exception e) {
-            System.out.println("\n\n" + e + "\n\n");
+            System.out.println("\nSe ha detectado mas de un error en la trama!");
         }
     }
 }
+
